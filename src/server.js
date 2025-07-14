@@ -2,12 +2,13 @@ import express from "express";
 import userRoutes from "./routes/userRoutes.js";
 import { connectToDatabase } from "./config/database.js";
 import UserRoutes from "./routes/userRoutes.js"
-
+import productRoutes from "./routes/productRoutes.js"
 let app = express();
 app.use(express.json());
 connectToDatabase();
 
 app.use("/auth", UserRoutes);
+app.use("/products", productRoutes);
 
 function helloWorld(request, response) {
     response.send("Hello World !!!!");

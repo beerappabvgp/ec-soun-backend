@@ -16,7 +16,8 @@ let userSchema = new mongoose.Schema(
     },
     contactNumber: {
         type: String,
-    }
+    },
+
 }
 );
 

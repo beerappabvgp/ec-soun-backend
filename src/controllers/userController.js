@@ -21,7 +21,6 @@ export let registerUser = async (req, res) => {
     }
 }   
 
-
 export let loginUser = async (req, res) => {
     // getting the information from the client
     try {
