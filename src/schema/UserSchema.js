@@ -17,8 +17,20 @@ let userSchema = new mongoose.Schema(
     contactNumber: {
         type: String,
     },
-
-}
+    cart: [
+        {
+            productId: {
+                type: mongoose.Schema.Types.ObjectId,
+                required: true,
+                ref: "Product"
+            },
+            quantity: {
+                type: Number,
+                required: true
+            }
+        }
+    ],
+    },
 );
 
 // Creates a new User Table in the database

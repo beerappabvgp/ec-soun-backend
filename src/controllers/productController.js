@@ -3,6 +3,7 @@ import Product from "../schema/productSchema.js";
 export let createProduct = async (req, res) => {
     try {
         // Getting all the information from the client
+    console.log("req: ", req);
     let { productName, price, description, quantity, brand } = req.body;
 
     if (!productName || !price || !description || !quantity || !brand) {
@@ -80,7 +81,9 @@ export let getProductById = async (req, res) => {
 export let updateProductById = async (req, res) => {
     try {
         // get the id from the url
+        console.log("requse from update: ", req)
         let { id } = req.params;
+      
         // get the product from the db
         let product = await Product.findById(id);
         if (!product) {
@@ -144,7 +147,7 @@ export let deleteProductById = async (req, res) => {
 
     } catch (error) {
         console.log("err while deleting the product...", error);
-        return res.json({
+        return res.status(500).json({
             success: false,
             message: "Internal server error ..."
         })
