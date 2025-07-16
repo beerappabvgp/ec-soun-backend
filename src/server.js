@@ -30,3 +30,7 @@ app.listen(5000);
 
 // console.log("app: ", app);
 
+
+
+// userId = 68773435a69178d38dd667d9
+// productId = 6874b391a2caad24c5e982ee
