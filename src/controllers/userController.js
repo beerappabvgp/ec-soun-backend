@@ -115,3 +115,71 @@ export let addToCart = async (req, res) => {
     }
 }
 
+export let getAllCartProducts = async (req, res) => {
+    try {
+        let { userId } = req.params;
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: "userId is required ... "
+            })
+        }
+        // check whether the user is present in the db or not 
+        let user = await User.findById(userId);
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "User not found in the DB..."
+            })
+        }
+        return res.status(200).json({
+            success: true,
+            products: user.cart
+        })
+    } catch (error) {
+        console.log("err while reading products from cart ... ", err);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
+
+export const deleteProductFromCart = async (req,res) => {
+    try {
+        let { userId, productId } = req.params;
+        let user = await User.findById(userId);
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "User not found"
+            })
+        }
+
+        let product = await Product.findById(productId);
+        if (!product) {
+            return res.status(400).json({
+                success: false,
+                message: "Product not found"
+            })
+        }
+        // delete the product from the cart 
+        let cart = user.cart
+        let updatedCart = []
+        for (let i = 0; i < cart.length; i++) {
+            if (productId === cart[i].productId) {
+                continue
+            }
+            updatedCart.push(cart[i])
+        }    
+        user.cart = updatedCart;
+        await user.save()
+    
+    } catch (error) {
+        console.log("error while deleting product from cart ... ", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
