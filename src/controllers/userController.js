@@ -1,3 +1,4 @@
+import { generateToken } from "../middlewares/authMiddlewares.js";
 import User from "../schema/UserSchema.js";
 import Product from "../schema/productSchema.js";
 
@@ -15,7 +16,7 @@ export let registerUser = async (req, res) => {
                 email: email
             }
         )
-        
+
         return res.status(201).json({
             success: true,
             user: user
@@ -27,7 +28,7 @@ export let registerUser = async (req, res) => {
             message: "Internal Server Error",
         })
     }
-}   
+}
 
 export let loginUser = async (req, res) => {
     // getting the information from the client
@@ -48,10 +49,13 @@ export let loginUser = async (req, res) => {
                 message: "Email or password is incorrect..."
             })
         }
+        let token = generateToken(user._id);
         return res.json({
             success: true,
-            message: "Logged in Succesfully .... "
-        })  
+            message: "Logged in Succesfully .... ",
+            user,
+            token
+        })
     } catch (error) {
         console.log("error: ", error)
         return res.json({
@@ -59,14 +63,14 @@ export let loginUser = async (req, res) => {
             message: "Internal server error"
         })
     }
-}   
+}
 
 
 export let addToCart = async (req, res) => {
     try {
         // I need to get all the information from the client
         console.log("req: ", req);
-        let { productId, quantity, userId } = req.body; 
+        let { productId, quantity, userId } = req.body;
         if (!productId || !quantity || !userId) {
             return res.status(400).json({
                 success: false,
@@ -145,7 +149,7 @@ export let getAllCartProducts = async (req, res) => {
     }
 }
 
-export const deleteProductFromCart = async (req,res) => {
+export let deleteProductFromCart = async (req, res) => {
     try {
         let { userId, productId } = req.params;
         let user = await User.findById(userId);
@@ -171,10 +175,10 @@ export const deleteProductFromCart = async (req,res) => {
                 continue
             }
             updatedCart.push(cart[i])
-        }    
+        }
         user.cart = updatedCart;
         await user.save()
-    
+
     } catch (error) {
         console.log("error while deleting product from cart ... ", error);
         return res.status(500).json({
@@ -183,3 +187,55 @@ export const deleteProductFromCart = async (req,res) => {
         })
     }
 }
+
+export let updateCartProduct = async (req, res) => {
+    try {
+        console.log("This is inside of update cart .... ")
+        let { userId, quantity, productId } = req.body;
+        let user = await User.findById(userId);
+        if (!user) {    
+            return res.status(400).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        let product = await Product.findById(productId);
+        if (!product) {
+            return res.status(400).json({
+                success: false,
+                message: "Product not found"
+            });
+        }
+
+        let found = false;
+        for (let i = 0; i < user.cart.length; i++) {
+            // Convert both to strings for comparison
+            if (String(productId) === String(user.cart[i].productId)) {
+                user.cart[i].quantity = quantity;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found in cart"
+            });
+        }
+
+        let updatedCart = await user.save();
+        return res.status(200).json({
+            success: true,
+            message: "Cart Item Updated successfully",
+            updatedCart
+        });
+    } catch (error) {
+        console.log("Error updating cart product: ", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};

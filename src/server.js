@@ -4,6 +4,33 @@ import { connectToDatabase } from "./config/database.js";
 import UserRoutes from "./routes/userRoutes.js"
 import productRoutes from "./routes/productRoutes.js"
 let app = express();
+
+
+
+// Middleware
+let count = 0
+function countRequests(req, res, next) {
+    count += 1;
+    console.log("The number of request received by server is: ", count);
+    next()
+}
+
+app.use(countRequests);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 app.use(express.json());
 connectToDatabase();
 
